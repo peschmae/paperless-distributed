@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: paperless-svc
+  namespace: paperless-distributed
+spec:
+  ports:
+  - port: 8000
+    protocol: TCP
+  selector:
+    app: paperless-ui
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: paperless
+  namespace: paperless-distributed
+spec:
+  rules:
+  - host: <ONE_HOST>
+    http:
+      paths:
+      - backend:
+          service:
+            name: paperless-svc
+            port:
+              number: 8000
+        path: /
+        pathType: ImplementationSpecific
+  # tls:
+  # - hosts:
+  #   - <ONE_HOST>
+  #   secretName: paperless-certificate

@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  creationTimestamp: null
+  name: export-backup
+  namespace: paperless-distributed
+spec:
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+      name: export-backup
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: paperless-data
+            - name: media
+              persistentVolumeClaim:
+                claimName: paperless-media
+            - name: backup
+              persistentVolumeClaim:
+                claimName: paperless-backup
+          containers:
+          - image: ghcr.io/paperless-ngx/paperless-ngx:1.16.1
+            name: export-backup
+            resources: {}
+            command:
+              - document_exporter
+            args:
+              - /usr/src/paperless/export
+              - -f
+              - --no-archive
+              - --no-thumbnail
+              - --split-manifest
+            envFrom:
+              - configMapRef:
+                name: paperless-environment
+            env:
+              # workaround since paperless always checks for write access on consumption dir
+              - name: PAPERLESS_CONSUMPTION_DIR
+                value: "/usr/src/paperless/export"
+            envFrom:
+              - secretRef:
+                  name: paperless-configs
+            volumeMounts:
+              - mountPath: /usr/src/paperless/data
+                name: data
+              - mountPath: /usr/src/paperless/media
+                name: media
+              - mountPath: /usr/src/paperless/export
+                name: backup
+          restartPolicy: OnFailure
+  schedule: "0 3 * * *"
+status: {}

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: paperless-environment
+  namespace: paperless-distributed
+data:
+  USERMAP_UID: "1024"
+  USERMAP_GID: "100"
+  PAPERLESS_REDIS: "redis://<REDIS_SERVER>:6379/<REDIS_DB_ID>"
+  PAPERLESS_DBHOST: <PSQL_SERVER>
+  PAPERLESS_DBNAME: paperless
+  PAPERLESS_DBUSER: paperless
+  PAPERLESS_OCR_LANGUAGE: deu
+  PAPERLESS_TIME_ZONE: Europe/Amsterdam
+  PAPERLESS_ALLOWED_HOSTS: <A_LIST_OF_HOSTS>
+  PAPERLESS_URL: <ONE_HOST>
+  PAPERLESS_ADMIN_USER: <ADMIN_USER>
+  PAPERLESS_CONSUMER_POLLING: "60"
+  PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{title}"
+  PAPERLESS_ENABLE_UPDATE_CHECK: "false"
+  PAPERLESS_DEBUG: "YES"

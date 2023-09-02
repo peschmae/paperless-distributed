@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: paperless-celery
+    component: paperless
+  name: paperless-celery
+  namespace: paperless-distributed
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paperless-celery
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: paperless-celery
+        component: paperless
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: paperless-data
+        - name: media
+          persistentVolumeClaim:
+            claimName: paperless-media
+        - name: export
+          persistentVolumeClaim:
+            claimName: paperless-export
+        - name: consume
+          persistentVolumeClaim:
+            claimName: paperless-consume
+        - name: temp
+          persistentVolumeClaim:
+            claimName: paperless-temp
+        - name: supervisord-config
+          configMap:
+            name: paperless-supervisord
+      containers:
+      - image: ghcr.io/paperless-ngx/paperless-ngx:1.16.1
+        name: paperless-ng
+        resources: {}
+        envFrom:
+          - secretRef:
+              name: paperless-configs
+          - configMapRef:
+              name: paperless-environment
+        volumeMounts:
+          - mountPath: /usr/src/paperless/data
+            name: data
+          - mountPath: /usr/src/paperless/media
+            name: media
+          - mountPath: /usr/src/paperless/export
+            name: export
+          - mountPath: /usr/src/paperless/consume
+            name: consume
+          - mountPath: /tmp/paperless/
+            name: temp
+          - mountPath: /etc/supervisord.conf
+            name: supervisord-config
+            subPath: supervisord-celery.conf
+status: {}
+
+
+
